@@ -11,7 +11,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root {
-  --lapislazuli: #2759aa;
+  --maroon: #2759aa;
   --blue: #007bff;
   --indigo: #6610f2;
   --purple: #6f42c1;
@@ -137,8 +137,8 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  height: 200px;
-  width: 100%;
+  height:33.3vh;
+  width:100%;
 }
 
 .img-text-wrapper {
@@ -157,6 +157,7 @@ body {
 .img-text-wrapper .subtitle {
   transition: 1s;
   color: transparent;
+  text-align: center;
 }
 
 .image-blur {
@@ -670,32 +671,33 @@ pre code {
 .container-md,
 .container-sm {
   width: 100%;
-  padding-right: 0.75rem;
-  padding-left: 0.75rem;
-  margin-right: auto;
-  margin-left: auto;
+  padding-right: 0rem;
+  padding-left: 0rem;
+  margin-right: 0rem;
+  margin-left: 0rem;
 }
 
 @media (min-width: 576px) {
   .container-sm, .container {
-    max-width: 540px;
+    max-width: 100%;
   }
 }
 @media (min-width: 768px) {
   .container-md, .container-sm, .container {
-    max-width: 720px;
+    max-width: 100%;
   }
 }
 @media (min-width: 992px) {
   .container-lg, .container-md, .container-sm, .container {
-    max-width: 960px;
+    max-width: 100%;
   }
 }
 @media (min-width: 1200px) {
   .container-xl, .container-lg, .container-md, .container-sm, .container {
-    max-width: 1140px;
+    max-width: 100%;
   }
 }
+
 .row {
   display: flex;
   flex-wrap: wrap;
@@ -6197,7 +6199,7 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #1f4788 !important;
+  background-color: #2759aa!important;
 }
 
 a.bg-primary:hover, a.bg-primary:focus,
@@ -10208,6 +10210,8 @@ p.lead {
   font-size: 3rem;
 }
 
+
+
 section.resume-section {
   display: flex;
   align-items: center;
@@ -10217,6 +10221,9 @@ section.resume-section {
   padding-bottom: 5rem;
   width: 100%
 }
+
+
+
 section.resume-section .resume-section-content {
   width: 100%;
 }
@@ -10233,4 +10240,25 @@ section.resume-section .resume-section-content {
     padding-top: 5rem;
     padding-bottom: 5rem;
   }
+
+
+section.header-section {
+  display: flex;
+  align-items: center;
+  width: 100%
 }
+
+section.header-section .header-section-content {
+  width: 100%;
+}
+@media (min-width: 768px) {
+  section.header-section {
+    min-height: 100vh;
+  }
+@media (min-width: 992px) {
+  section.header-section {
+    padding-left: 0rem;
+    padding-right: 0rem;
+    padding-top: 0rem;
+    padding-bottom: 0rem;
+  }
