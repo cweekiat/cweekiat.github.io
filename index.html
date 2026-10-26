@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Robotics &amp; AI Lab Notes</title>
+<meta name="description" content="Robotics, AI and computer vision projects: learned flight control, event-camera perception, open datasets, and Formula 1 strategy and aero models.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231f6bff'/><path d='M8 22 L16 8 L24 22 Z' fill='none' stroke='white' stroke-width='2.5'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: an engineering drawing sheet. Every project is a numbered sheet with a title block,
+   readouts in mono, a live pursuit-guidance HUD as the hero. */
+:root{
+  --paper:#eef1f4; --sheet:#f9fafb; --ink:#14202c; --dim:#5b6b7b; --rule:#c9d2dc; --grid:#dfe5eb;
+  --signal:#1f6bff; --trace:#0aa5b8; --ok:#1a8a5a; --warm:#c2410c;
+  --display:'Chakra Petch','Arial Narrow',system-ui,sans-serif;
+  --body:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0c131b; --sheet:#111a24; --ink:#e3eaf1; --dim:#8899aa; --rule:#243444; --grid:#18242f;
+  --signal:#4d8dff; --trace:#2fd3e6; --ok:#3fc48a; --warm:#fb923c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0c131b; --sheet:#111a24; --ink:#e3eaf1; --dim:#8899aa; --rule:#243444; --grid:#18242f;
+  --signal:#4d8dff; --trace:#2fd3e6; --ok:#3fc48a; --warm:#fb923c; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.65 var(--body);-webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px}
+a{color:var(--trace)}
+:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.mono{font-family:var(--mono)}
+.lbl{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+/* nav */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--sheet);border-bottom:1px solid var(--rule)}
+nav .wrap{display:flex;align-items:center;gap:20px;height:54px}
+.mark{display:flex;align-items:center;gap:10px;margin-right:auto;text-decoration:none;color:var(--ink);font:600 15px var(--display);letter-spacing:.04em}
+.mark i{width:22px;height:22px;background:var(--signal);clip-path:polygon(50% 8%,92% 88%,8% 88%)}
+nav a.l{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-decoration:none}
+nav a.l:hover{color:var(--signal)}
+#theme{border:1px solid var(--rule);background:none;color:var(--dim);font:12px var(--mono);padding:5px 9px;border-radius:4px;cursor:pointer}
+@media(max-width:680px){nav a.l{display:none}}
+
+/* hero */
+.hero{padding-block:44px 28px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:36px;align-items:center}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+h1{font:700 clamp(40px,6vw,68px)/1 var(--display);letter-spacing:-.01em;margin:14px 0 18px;text-wrap:balance}
+h1 span{color:var(--signal)}
+.lead{font-size:clamp(17px,1.8vw,19px);color:var(--dim);max-width:34em;margin:0}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--ink);border-radius:3px;
+  font:500 13px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;background:var(--sheet);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--ink)}
+.btn.hot{background:var(--signal);border-color:var(--signal);color:#fff}
+.btn.hot:hover{box-shadow:3px 3px 0 var(--ink)}
+
+/* HUD */
+.hud{position:relative;background:var(--sheet);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
+.hud canvas{display:block;width:100%;aspect-ratio:16/10;cursor:crosshair;max-width:100%}
+.hud-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--rule)}
+.hud-bar div{padding:9px 12px;border-right:1px solid var(--rule);min-width:0}
+.hud-bar div:last-child{border-right:0}
+.hud-bar b{display:block;font:500 18px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
+.hud-tag{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
+.hud-ctl{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--rule);flex-wrap:wrap;align-items:center}
+.hud-ctl label{font:12px var(--mono);color:var(--dim);display:flex;align-items:center;gap:8px}
+.hud-ctl input{accent-color:var(--signal);width:110px}
+
+/* sheets */
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;margin-block:28px;position:relative}
+.tb{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;border-bottom:1px solid var(--rule)}
+.tb>div{padding:12px 16px;border-right:1px solid var(--rule);min-width:0}
+.tb>div:last-child{border-right:0}
+.tb .no{font:700 30px/1 var(--display);color:var(--signal);display:flex;align-items:center}
+.tb .ttl{font:700 clamp(22px,2.6vw,30px)/1.1 var(--display);margin-top:4px;text-wrap:balance}
+.tb .val{font:500 13px var(--mono);margin-top:5px;color:var(--ink)}
+@media(max-width:720px){.tb{grid-template-columns:auto minmax(0,1fr)}.tb>div:nth-child(n+3){display:none}}
+.body{padding:26px;display:grid;gap:28px}
+.body>*,.cols>*,.hero-grid>*{min-width:0}
+@media(max-width:600px){.body{padding:18px}}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+@media(max-width:860px){.cols{grid-template-columns:1fr}}
+.q{font:600 clamp(19px,2vw,22px)/1.35 var(--display);margin:0;text-wrap:balance;max-width:34em}
+p.t{margin:0;color:var(--dim);max-width:62ch}
+p.t b{color:var(--ink);font-weight:600}
+ul.spec{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+ul.spec li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;color:var(--dim)}
+ul.spec li::before{content:"▸";color:var(--signal);font-family:var(--mono)}
+ul.spec b{color:var(--ink);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 11.5px var(--mono);padding:3px 8px;border:1px solid var(--rule);border-radius:2px;color:var(--dim)}
+.readouts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border:1px solid var(--rule);border-radius:3px}
+.readouts div{padding:14px;border-right:1px solid var(--rule);min-width:0}
+.readouts div:last-child{border-right:0}
+.readouts b{display:block;font:600 clamp(24px,3vw,32px)/1.1 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.readouts span{font-size:13px;color:var(--dim)}
+@media(max-width:520px){.readouts{grid-template-columns:1fr}.readouts div{border-right:0;border-bottom:1px solid var(--rule)}.readouts div:last-child{border-bottom:0}}
+figure{margin:0;display:grid;gap:8px}
+figure img,figure video{width:100%;max-width:100%;display:block;border:1px solid var(--rule);border-radius:3px;background:#fff}
+figure video{background:#000}
+figcaption{font:12.5px/1.5 var(--mono);color:var(--dim)}
+figcaption b{color:var(--signal);font-weight:500}
+
+/* switch + chart */
+.panel{border:1px solid var(--rule);border-radius:3px;padding:16px}
+.switch{display:inline-flex;border:1px solid var(--ink);border-radius:3px;overflow:hidden;margin-bottom:14px;flex-wrap:wrap}
+.switch button{border:0;background:none;color:var(--ink);font:500 12px var(--mono);padding:7px 12px;cursor:pointer;letter-spacing:.03em}
+.switch button+button{border-left:1px solid var(--ink)}
+.switch button[aria-pressed="true"]{background:var(--ink);color:var(--sheet)}
+svg.chart{width:100%;height:auto;display:block}
+.note{font:12px/1.5 var(--mono);color:var(--dim);margin:10px 0 0}
+
+/* tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--rule);overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 14px;font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--signal)}
+.tabpane{padding-top:20px}
+.probe{display:grid;gap:10px}
+.probe .r{display:grid;grid-template-columns:160px minmax(0,1fr) 54px;gap:10px;align-items:center;font:12.5px var(--mono);color:var(--dim)}
+.probe .r b{color:var(--ink);font-weight:500;text-align:right;font-variant-numeric:tabular-nums}
+.probe .bar{height:10px;border:1px solid var(--rule);background:var(--paper)}
+.probe .bar i{display:block;height:100%;background:var(--trace);transition:width .8s cubic-bezier(.2,.7,.2,1)}
+.probe .bar i.hi{background:var(--signal)}
+@media(max-width:520px){.probe .r{grid-template-columns:110px minmax(0,1fr) 46px}}
+
+/* dataset table */
+.tw{overflow-x:auto;border:1px solid var(--rule);border-radius:3px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--rule)}
+th{font:500 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);background:var(--paper)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr{cursor:default} tbody tr:hover td{background:var(--paper)}
+td .sz{display:inline-block;height:6px;background:var(--trace);vertical-align:middle;margin-right:8px;opacity:.75}
+
+/* about */
+.edu{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.edu div{border:1px solid var(--rule);border-radius:3px;padding:16px}
+.edu h4{font:600 17px var(--display);margin:6px 0 4px}
+.edu p{margin:0;color:var(--dim);font-size:14.5px}
+.skillgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0;border:1px solid var(--rule);border-radius:3px}
+.skillgrid div{padding:14px 16px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);display:grid;gap:4px;min-width:0}
+.skillgrid b{font:600 16px var(--display)}
+.skillgrid span{font:12.5px/1.5 var(--mono);color:var(--dim)}
+
+footer{padding-block:36px 48px;color:var(--dim);font:12px/1.6 var(--mono)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+
+<header class="hero" id="top"><div class="wrap hero-grid">
+  <div>
+    <h1>Robotics · AI ·<br><span>Computer vision</span></h1>
+    <p class="lead">I take a systematic, technical approach to problems: model the system, build the simulation, run controlled experiments, and let the numbers decide. Below are selected projects, with code, data and results.</p>
+    <div class="cta">
+      <a class="btn hot" href="#fpv">View research ↓</a>
+      <a class="btn" href="assets/fpv/from_pixels_to_sticks.pdf">Paper PDF</a>
+      <a class="btn" href="https://github.com/cweekiat">GitHub ↗</a>
+    </div>
+  </div>
+  <div class="hud" aria-label="Interactive pursuit-guidance simulation">
+    <div class="hud-tag"><span class="lbl">Pursuit guidance · top-down</span><span class="lbl" id="hudState">tracking</span></div>
+    <canvas id="hud"></canvas>
+    <div class="hud-bar">
+      <div><span class="lbl">Range</span><b id="rRange">—</b></div>
+      <div><span class="lbl">Speed</span><b id="rSpeed">—</b></div>
+      <div><span class="lbl">Heading err</span><b id="rErr">—</b></div>
+      <div><span class="lbl">Intercepts</span><b id="rHits">0</b></div>
+    </div>
+    <div class="hud-ctl">
+      <label for="lat">Latency <input id="lat" type="range" min="0" max="40" value="8"><span id="latV" class="mono">80 ms</span></label>
+      <label for="gain">Nav gain <input id="gain" type="range" min="1" max="6" step=".5" value="3"><span id="gainV" class="mono">3.0</span></label>
+      <span class="lbl" style="margin-left:auto">click to move target</span>
+    </div>
+  </div>
+</div></header>
+
+<main class="wrap">
+
+<!-- ================= 01 FPV ================= -->
+<article class="sheet" id="fpv">
+  <div class="tb">
+    <div class="no">01</div>
+    <div><div class="lbl">Project · Learned control</div><div class="ttl">From Pixels to Sticks</div></div>
+    <div><div class="lbl">Stack</div><div class="val">JAX · PPO · DAgger · GRU</div></div>
+    <div><div class="lbl">Year</div><div class="val">2026</div></div>
+  </div>
+  <div class="body">
+    <div class="cols">
+      <div style="display:grid;gap:18px">
+        <p class="q">What does a camera-only FPV acro pilot need to learn?</p>
+        <p class="t">A simulated quadrotor flies to targets <b>100–200 m</b> away at up to <b>40 m/s</b>. It commands throttle and roll, pitch and yaw rates, and sees only noisy, delayed <b>32×24</b> video, as a human FPV pilot does. It gets no position, velocity or attitude.</p>
+        <div class="readouts">
+          <div><b>77%</b><span>targets reached by the best camera-only pilot</span></div>
+          <div><b>+21.7</b><span>points from memory alone (5 seeds)</span></div>
+          <div><b>3%</b><span>a calibrated hand-designed pilot</span></div>
+        </div>
+        <div class="cta" style="margin:0">
+          <a class="btn hot" href="assets/fpv/from_pixels_to_sticks.pdf">Read paper</a>
+          <a class="btn" href="https://github.com/cweekiat/fpv-rl-jax">Code ↗</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="switch" role="group" aria-label="Training stage" id="fpvSw">
+          <button type="button" aria-pressed="true" data-k="0">Imitation</button><button type="button" aria-pressed="false" data-k="1">+ more DAgger</button><button type="button" aria-pressed="false" data-k="2">+ RL fine-tune</button>
+        </div>
+        <svg class="chart" id="fpvChart" role="img" aria-label="Success rate by policy"></svg>
+        <p class="note">Success on 1024 randomised long-range episodes, 15 s limit. Mean ± s.d. over 5 seeds. "+ more DAgger" spends the same compute as RL, as a control.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="tabs" role="tablist" id="fpvTabs">
+        <button role="tab" aria-selected="true" data-p="t1">Pipeline</button>
+        <button role="tab" aria-selected="false" data-p="t2">Why memory</button>
+        <button role="tab" aria-selected="false" data-p="t3">Flight log</button>
+        <button role="tab" aria-selected="false" data-p="t4">Active vision</button>
+        <button role="tab" aria-selected="false" data-p="t5">Demo video</button>
+      </div>
+      <div class="tabpane" id="t1"><div class="cols">
+        <figure><img src="assets/fpv/fig1_overview.png" alt="Teacher, student and RL fine-tuning pipeline" loading="lazy"><figcaption><b>FIG 1</b> Privileged teacher → camera-only student → self-improvement.</figcaption></figure>
+        <ul class="spec">
+          <li><span><b>Teacher.</b> PPO on the true state with an asymmetric critic. It only learns where the target is once it has seen it.</span></li>
+          <li><span><b>Student.</b> A CNN with an optional GRU over a 120° view and two gaze-steered 30° and 8° views, trained by DAgger on its own flights.</span></li>
+          <li><span><b>Fine-tune.</b> Recurrent PPO on the student, with a privileged critic and a decaying imitation anchor.</span></li>
+          <li><span><b>18 randomised parameters</b> per flight: thrust-to-weight, motor lag, 0–40 ms latency each way, camera tilt, wind, gusts, battery sag, ground effect, sensor noise.</span></li>
+          <li><span><b>One XLA program</b> on a laptop CPU: 1024 drones in parallel, im2col convolutions about 25× faster inside <code class="mono">lax.scan</code>.</span></li>
+        </ul>
+      </div></div>
+      <div class="tabpane" id="t2" hidden><div class="cols">
+        <div style="display:grid;gap:14px">
+          <p class="t">Linear probes read physical quantities straight from the network's features, against a memoryless control and shuffled labels. The current frames already show <b>attitude and body rates</b>. Memory adds <b>velocity</b>, which no single image contains.</p>
+          <p class="t">There is no sign that the pilot identifies the drone's thrust or lag online. The gain comes from integrating motion over time.</p>
+        </div>
+        <div class="probe" id="probe">
+          <div class="r"><span>velocity · no memory</span><div class="bar"><i data-w="57"></i></div><b>0.57</b></div>
+          <div class="r"><span>velocity · memory</span><div class="bar"><i class="hi" data-w="79"></i></div><b>0.79</b></div>
+          <div class="r"><span>body rates</span><div class="bar"><i data-w="92"></i></div><b>0.92</b></div>
+          <div class="r"><span>gravity direction</span><div class="bar"><i data-w="88"></i></div><b>0.88</b></div>
+          <div class="r"><span>shuffled labels</span><div class="bar"><i data-w="0"></i></div><b>−0.01</b></div>
+          <span class="note" style="margin:0">Probe R² (1.0 = perfectly decodable)</span>
+        </div>
+      </div></div>
+      <div class="tabpane" id="t3" hidden>
+        <figure><img src="assets/fpv/lr_flights.png" alt="Six long-range flights" loading="lazy"><figcaption><b>FIG 2</b> Six long-range flights. Solid: teacher. Dashed: camera-only student. Failures overshoot, lose the target and circle; 55–66% of timeouts never get within 20 m, so the open problem is search.</figcaption></figure>
+      </div>
+      <div class="tabpane" id="t4" hidden><div class="cols">
+        <figure><img src="assets/fpv/fpv_view.gif" alt="The student's camera view" loading="lazy"><figcaption><b>FIG 3</b> What the pilot sees.</figcaption></figure>
+        <figure><img src="assets/fpv/fig8_foveation.png" alt="Gaze-steered views" loading="lazy"><figcaption><b>FIG 4</b> The pilot aims its own narrow views. A 2 m target vanishes from the 120° view beyond about 100 m but still covers pixels at 8°.</figcaption></figure>
+      </div></div>
+      <div class="tabpane" id="t5" hidden>
+        <figure><video src="assets/fpv/fpv_demo.mp4" controls muted playsinline preload="none" poster="assets/fpv/fig1_overview.png"></video><figcaption><b>VID 1</b> 65 s overview: inputs, two long-range flights, results.</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- ================= 02 DENSE-CUAS ================= -->
+<article class="sheet" id="dense">
+  <div class="tb">
+    <div class="no">02</div>
+    <div><div class="lbl">Project · Neuromorphic perception</div><div class="ttl">DENSE-CUAS</div></div>
+    <div><div class="lbl">Stack</div><div class="val">Event camera · SNN · YOLO11</div></div>
+    <div><div class="lbl">Year</div><div class="val">2026</div></div>
+  </div>
+  <div class="body">
+    <div class="cols">
+      <div style="display:grid;gap:18px">
+        <p class="q">Can a camera that only sees change spot small drones in a city better than a normal camera with AI?</p>
+        <p class="t">An event camera reports per-pixel brightness changes with microsecond timing. Still buildings send nothing, fast motion does not blur, and spinning propellers flicker at a measurable rhythm. Both sensors watched the <b>same scenes</b>, and every detector was held to the <b>same false-alarm rate</b> before comparing detections.</p>
+        <ul class="spec">
+          <li><span><b>PropPulse</b> tracks moving event clusters and cancels the drone's own motion.</span></li>
+          <li><span>It then listens for the propeller's <b>blade-pass rhythm</b>, using a frequency analysis and a bank of spiking resonator neurons that react to every event.</span></li>
+        </ul>
+        <div class="cta" style="margin:0">
+          <a class="btn hot" href="https://cweekiat.github.io/dense-cuas/">Project page ↗</a>
+          <a class="btn" href="https://github.com/cweekiat/dense-cuas">Code ↗</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="switch" role="group" aria-label="False-alarm rate" id="denseSw">
+          <button type="button" aria-pressed="false" data-k="0">1% false alarms</button><button type="button" aria-pressed="true" data-k="1">5% false alarms</button>
+        </div>
+        <svg class="chart" id="denseChart" role="img" aria-label="Detection rate by detector"></svg>
+        <p class="note">Detection rate on 25 held-out recordings (FRED dataset). At 5% false alarms, events lead the best RGB detector by +0.20 [0.12, 0.28].</p>
+      </div>
+    </div>
+    <div class="cols">
+      <figure><img src="assets/dense_overview.png" alt="DENSE-CUAS comparison setup" loading="lazy"><figcaption><b>FIG 1</b> Event and RGB detectors compared at the same false-alarm rate.</figcaption></figure>
+      <figure><img src="assets/dense_pulse.png" alt="Propeller pulse signature" loading="lazy"><figcaption><b>FIG 2</b> The propeller's blade-pass signature in the event stream.</figcaption></figure>
+    </div>
+  </div>
+</article>
+
+<!-- ================= 03 CUAS ================= -->
+<article class="sheet" id="cuas">
+  <div class="tb">
+    <div class="no">03</div>
+    <div><div class="lbl">Project · Open data &amp; models</div><div class="ttl">CUAS: datasets and detectors</div></div>
+    <div><div class="lbl">Stars</div><div class="val">★ 30</div></div>
+    <div><div class="lbl">Years</div><div class="val">2023–25</div></div>
+  </div>
+  <div class="body">
+    <div class="cols">
+      <div style="display:grid;gap:18px">
+        <p class="q">A single starting point for counter-drone vision: the public datasets, the hard cases, and trained models.</p>
+        <p class="t">The repository compiles the main drone-detection datasets with their sizes and links, catalogues why the problem is hard, and proposes a <b>hybrid detector</b> that pairs a CNN with tracking to keep small, fast drones locked between detections.</p>
+        <div class="chips">
+          <span class="chip">out of view</span><span class="chip">occlusion</span><span class="chip">dynamic background</span><span class="chip">low resolution</span><span class="chip">tiny targets</span><span class="chip">fast random motion</span><span class="chip">moving camera</span><span class="chip">limited onboard compute</span>
+        </div>
+        <div class="cta" style="margin:0"><a class="btn hot" href="https://github.com/cweekiat/CUAS">Datasets &amp; models ↗</a></div>
+      </div>
+      <figure><img src="assets/cuas_demo.gif" alt="Drone detection and tracking demo" loading="lazy"><figcaption><b>VID 1</b> Detection and tracking of a drone from another drone.</figcaption></figure>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Dataset</th><th style="text-align:right">Images</th><th>Size</th><th>What it covers</th></tr></thead>
+        <tbody id="dsBody"></tbody>
+      </table>
+    </div>
+    <figure><img src="assets/cuas_method.png" alt="Hybrid detection and tracking method" loading="lazy"><figcaption><b>FIG 1</b> Hybrid pipeline: CNN detection plus tracking.</figcaption></figure>
+  </div>
+</article>
+
+<!-- ================= ABOUT ================= -->
+<article class="sheet" id="about">
+  <div class="tb">
+    <div class="no">—</div>
+    <div><div class="lbl">About</div><div class="ttl">Background</div></div>
+    <div><div class="lbl">Degree</div><div class="val">M.Sc. Robotics</div></div>
+    <div><div class="lbl">Based</div><div class="val">Singapore</div></div>
+  </div>
+  <div class="body">
+    <p class="t">Robotics engineer with a Master's in Robotics and a first-class mechanical engineering degree from NUS. My work spans robotics, AI and computer vision, from perception models and datasets to control and simulation, tested through controlled, multi-seed experiments.</p>
+    <div class="edu">
+      <div><span class="lbl">2023 – 2024</span><h4>M.Sc. Robotics · NUS</h4><p>Autonomous robot navigation, robot vision, kinematics and dynamics, AI planning and decision making, optimisation in dynamical systems. Research: novel soft-robot designs generated with 3D diffusion models.</p></div>
+      <div><span class="lbl">2020 – 2023</span><h4>B.Eng. Mechanical Engineering · NUS</h4><p>First Class Honours. Engineering Scholars Programme (scholarship) and the NUS Overseas Colleges entrepreneurship programme in Munich.</p></div>
+      <div><span class="lbl">2021 – 2022</span><h4>Exchanges</h4><p>Georgia Institute of Technology (2022), Technical University of Munich (2022), UC Berkeley (2021).</p></div>
+    </div>
+    <p class="t"><b>Outside the lab:</b> Formula 1 strategy, vehicle engineering and aerodynamics; marathon training; biohacking.</p>
+    <div class="skillgrid">
+      <div><b>Deep learning</b><span>PyTorch · transformers · CNNs · training at scale</span></div>
+      <div><b>Reinforcement learning</b><span>PPO · imitation learning · sim-to-real</span></div>
+      <div><b>Computer vision</b><span>detection · tracking · DETR · YOLO · event cameras</span></div>
+      <div><b>Generative AI</b><span>diffusion models · synthetic data generation</span></div>
+      <div><b>Edge &amp; GPU</b><span>CUDA · real-time inference · model optimisation</span></div>
+      <div><b>Robotics &amp; control</b><span>ROS · SLAM · flight control · motion planning</span></div>
+      <div><b>Simulation</b><span>JAX · GPU-parallel physics · Gazebo</span></div>
+      <div><b>Languages</b><span>Python · C++ · MATLAB</span></div>
+    </div>
+  </div>
+</article>
+
+</main>
+
+<footer><div class="wrap">© 2026 Wee Kiat Chan · github.com/cweekiat · Research code and data are shared for noncommercial use; see each repository's licence.</div></footer>
+
+<script>
+const tok=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* theme: follows the viewer's local time (light 07:00–19:00) */
+(()=>{const r=document.documentElement,byClock=()=>{const h=new Date().getHours();return h>=7&&h<19?'light':'dark'};
+  r.dataset.theme=byClock();setInterval(()=>{if(r.dataset.theme!==byClock()){r.dataset.theme=byClock();redraw()}},60000)})();
+
+/* ---------- HUD: proportional-navigation pursuit with latency ---------- */
+const cv=document.getElementById('hud'),g=cv.getContext('2d');
+let W=0,H=0,tgt,uav,hist=[],hits=0,lat=8,gain=3,flash=0;
+function fit(){const d=devicePixelRatio||1,r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;g.setTransform(d,0,0,d,0,0)}
+function reset(){uav={x:W*.12,y:H*.8,h:-0.6,v:2.2,trail:[]};hist=[];
+  tgt=tgt||{x:W*.75,y:H*.35,vx:.6,vy:.25}}
+fit();reset();new ResizeObserver(fit).observe(cv);
+cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();tgt.x=e.clientX-r.left;tgt.y=e.clientY-r.top});
+const latI=document.getElementById('lat'),gainI=document.getElementById('gain');
+latI.oninput=()=>{lat=+latI.value;document.getElementById('latV').textContent=lat*10+' ms'};
+gainI.oninput=()=>{gain=+gainI.value;document.getElementById('gainV').textContent=gain.toFixed(1)};
+const els={range:rRange,speed:rSpeed,err:rErr,hits:rHits,state:hudState};
+let lastLos=null,frame=0;
+function tick(){
+  frame++;
+  // target wanders and bounces
+  tgt.x+=tgt.vx;tgt.y+=tgt.vy;
+  if(tgt.x<30||tgt.x>W-30)tgt.vx*=-1; if(tgt.y<40||tgt.y>H-30)tgt.vy*=-1;
+  // delayed observation of line of sight
+  hist.push({x:tgt.x,y:tgt.y}); if(hist.length>lat+1)hist.shift();
+  const seen=hist[0];
+  const los=Math.atan2(seen.y-uav.y,seen.x-uav.x);
+  let dLos=lastLos==null?0:Math.atan2(Math.sin(los-lastLos),Math.cos(los-lastLos)); lastLos=los;
+  let err=Math.atan2(Math.sin(los-uav.h),Math.cos(los-uav.h));
+  let turn=gain*dLos+0.04*err; turn=Math.max(-.07,Math.min(.07,turn));
+  uav.h+=turn; uav.x+=Math.cos(uav.h)*uav.v; uav.y+=Math.sin(uav.h)*uav.v;
+  uav.trail.push([uav.x,uav.y]); if(uav.trail.length>220)uav.trail.shift();
+  const range=Math.hypot(tgt.x-uav.x,tgt.y-uav.y);
+  if(range<10){hits++;flash=30;uav.x=Math.random()<.5?20:W-20;uav.y=H-20;uav.h=-Math.PI/2;uav.trail=[];lastLos=null}
+  if(uav.x<-40||uav.x>W+40||uav.y<-40||uav.y>H+40){uav.x=W/2;uav.y=H-10;uav.h=-Math.PI/2;uav.trail=[];lastLos=null}
+  draw(range,err);
+  if(frame%6===0){els.range.textContent=(range/4).toFixed(1)+' m';els.speed.textContent=(uav.v*12).toFixed(1)+' m/s';
+    els.err.textContent=(err*57.3).toFixed(0)+'°';els.hits.textContent=hits;els.state.textContent=flash?'intercept':(Math.abs(err)>1?'reacquiring':'tracking')}
+  if(flash)flash--;
+  if(!still)requestAnimationFrame(tick);
+}
+function draw(range,err){
+  const ink=tok('--ink'),grid=tok('--grid'),rule=tok('--rule'),sig=tok('--signal'),tr=tok('--trace'),sheet=tok('--sheet');
+  g.fillStyle=sheet;g.fillRect(0,0,W,H);
+  g.strokeStyle=grid;g.lineWidth=1;
+  for(let x=0;x<W;x+=20){g.beginPath();g.moveTo(x+.5,0);g.lineTo(x+.5,H);g.stroke()}
+  for(let y=0;y<H;y+=20){g.beginPath();g.moveTo(0,y+.5);g.lineTo(W,y+.5);g.stroke()}
+  g.strokeStyle=rule;for(let x=0;x<W;x+=100){g.beginPath();g.moveTo(x+.5,0);g.lineTo(x+.5,H);g.stroke()}
+  for(let y=0;y<H;y+=100){g.beginPath();g.moveTo(0,y+.5);g.lineTo(W,y+.5);g.stroke()}
+  // scale bar
+  g.fillStyle=ink;g.font='11px IBM Plex Mono, monospace';g.fillRect(W-112,H-18,100,2);g.fillText('25 m',W-80,H-24);
+  // delayed ghost
+  const s=hist[0];g.strokeStyle=sig;g.globalAlpha=.45;g.setLineDash([3,3]);g.beginPath();g.arc(s.x,s.y,9,0,7);g.stroke();g.setLineDash([]);g.globalAlpha=1;
+  // LOS
+  g.strokeStyle=sig;g.globalAlpha=.35;g.beginPath();g.moveTo(uav.x,uav.y);g.lineTo(s.x,s.y);g.stroke();g.globalAlpha=1;
+  // target
+  g.strokeStyle=sig;g.lineWidth=2;g.beginPath();g.arc(tgt.x,tgt.y,7+(flash?flash/3:0),0,7);g.stroke();
+  g.beginPath();g.moveTo(tgt.x-12,tgt.y);g.lineTo(tgt.x-4,tgt.y);g.moveTo(tgt.x+4,tgt.y);g.lineTo(tgt.x+12,tgt.y);
+  g.moveTo(tgt.x,tgt.y-12);g.lineTo(tgt.x,tgt.y-4);g.moveTo(tgt.x,tgt.y+4);g.lineTo(tgt.x,tgt.y+12);g.stroke();
+  // trail
+  g.strokeStyle=tr;g.lineWidth=1.6;g.beginPath();uav.trail.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();
+  // quad icon
+  g.save();g.translate(uav.x,uav.y);g.rotate(uav.h);g.strokeStyle=ink;g.lineWidth=1.5;
+  g.beginPath();g.moveTo(-7,-7);g.lineTo(7,7);g.moveTo(-7,7);g.lineTo(7,-7);g.stroke();
+  for(const [a,b] of [[-7,-7],[7,7],[-7,7],[7,-7]]){g.beginPath();g.arc(a,b,4,0,7);g.stroke()}
+  g.fillStyle=tr;g.beginPath();g.moveTo(14,0);g.lineTo(9,-3);g.lineTo(9,3);g.fill();g.restore();
+}
+tick();
+
+/* ---------- charts ---------- */
+function bars(svg,rows,o={}){
+  const w=520,L=o.L||128,R=58,top=6,bh=o.bh||24,gap=10,n=rows.length,h=top+n*(bh+gap)+16;
+  const ink=tok('--ink'),dim=tok('--dim'),rule=tok('--rule');
+  const x=v=>L+(w-L-R)*v;let s='';
+  [0,.25,.5,.75,1].forEach(f=>{s+=`<line x1="${x(f)}" x2="${x(f)}" y1="${top}" y2="${h-16}" stroke="${rule}" stroke-width="1"/>`+
+    `<text x="${x(f)}" y="${h-3}" text-anchor="middle" fill="${dim}" font-family="IBM Plex Mono,monospace" font-size="10">${f*100}%</text>`});
+  rows.forEach((r,i)=>{const y=top+i*(bh+gap),end=Math.min(1,r.v+(r.sd||0));
+    s+=`<text x="${L-8}" y="${y+bh/2+4}" text-anchor="end" fill="${ink}" font-family="IBM Plex Mono,monospace" font-size="11">${r.n}</text>`;
+    s+=`<rect x="${L}" y="${y}" height="${bh}" width="${x(r.v)-L}" fill="${r.c}" fill-opacity="${r.o||1}">${still?'':`<animate attributeName="width" from="0" to="${x(r.v)-L}" dur=".45s" fill="freeze"/>`}</rect>`;
+    if(r.sd){const a=x(Math.max(0,r.v-r.sd)),b=x(end),m=y+bh/2;
+      s+=`<path d="M${a} ${m}H${b}M${a} ${y+6}V${y+bh-6}M${b} ${y+6}V${y+bh-6}" stroke="${ink}" stroke-width="1.3" fill="none"/>`}
+    s+=`<text x="${x(end)+7}" y="${y+bh/2+4}" fill="${ink}" font-family="IBM Plex Mono,monospace" font-size="11" font-weight="500">${(r.v*100).toFixed(1)}</text>`});
+  svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=s;
+}
+const FPV=[[.448,.129,.665,.068],[.603,.069,.742,.066],[.675,.055,.772,.102]];
+const DENSE=[[.32,.22,.31,.29,.01],[.70,.49,.50,.44,.06]];
+let fk=0,dk=1;
+function drawFpv(){const d=FPV[fk];bars(fpvChart,[
+  {n:'no memory',v:d[0],sd:d[1],c:tok('--trace')},{n:'memory (GRU)',v:d[2],sd:d[3],c:tok('--signal')},
+  {n:'visual servo',v:.03,c:tok('--dim'),o:.7},{n:'teacher (state)',v:.995,c:tok('--dim'),o:.3}])}
+function drawDense(){const d=DENSE[dk];bars(denseChart,[
+  {n:'event+PropPulse',v:d[0],c:tok('--signal')},{n:'event+YOLO11n',v:d[1],c:tok('--signal'),o:.45},
+  {n:'RGB+U-Net',v:d[2],c:tok('--trace')},{n:'RGB+YOLO11n',v:d[3],c:tok('--trace'),o:.55},
+  {n:'RGB bg-subtract',v:d[4],c:tok('--dim'),o:.6}],{bh:20})}
+function sw(id,f){document.querySelectorAll(`#${id} button`).forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(`#${id} button`).forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');f(+b.dataset.k)})}
+sw('fpvSw',k=>{fk=k;drawFpv()});sw('denseSw',k=>{dk=k;drawDense()});
+
+/* tabs */
+document.querySelectorAll('#fpvTabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#fpvTabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('#fpv .tabpane').forEach(p=>p.hidden=p.id!==b.dataset.p);
+  if(b.dataset.p==='t2')probe()});
+function probe(){document.querySelectorAll('#probe i').forEach(i=>{i.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=i.dataset.w+'%'))})}
+
+/* datasets */
+const DS=[['Anti-UAV',186514,'RGB and infrared recordings across lighting and backgrounds'],
+ ['Drone-vs-Bird',104760,'Distant UAVs among birds and small clutter'],
+ ['MAV-VID',40232,'Drones filmed from other drones and from the ground'],
+ ['CUAS (own)',8555,'Air-to-air and ground views, annotated for detection'],
+ ['DUT Anti-UAV',7200,'Drone-to-drone and ground views, plus 20 tracking clips'],
+ ['VisDrone',10209,'Drone-captured scenes (static images; 261,908 video frames)']];
+const mx=Math.max(...DS.map(d=>d[1]));
+dsBody.innerHTML=DS.map(d=>`<tr><td><b>${d[0]}</b></td><td class="n">${d[1].toLocaleString('en')}</td><td style="min-width:120px"><span class="sz" style="width:${Math.max(3,d[1]/mx*110)}px"></span></td><td style="color:var(--dim)">${d[2]}</td></tr>`).join('');
+
+function redraw(){drawFpv();drawDense()}
+redraw();
+</script>
+</body>
+</html>
