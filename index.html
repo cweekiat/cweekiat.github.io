@@ -50,11 +50,11 @@ nav a.l:hover{color:var(--signal)}
 
 /* hero */
 .hero{padding-block:44px 28px}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:36px;align-items:center}
+.hero-grid{display:grid;grid-template-columns:minmax(0,760px);gap:36px;align-items:center}
 @media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
 h1{font:700 clamp(40px,6vw,68px)/1 var(--display);letter-spacing:-.01em;margin:14px 0 18px;text-wrap:balance}
 h1 span{color:var(--signal)}
-.lead{font-size:clamp(17px,1.8vw,19px);color:var(--dim);max-width:34em;margin:0}
+.lead{font-size:clamp(17px,1.8vw,19px);color:var(--dim);margin:0}
 .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px solid var(--ink);border-radius:3px;
   font:500 13px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink);text-decoration:none;background:var(--sheet);transition:transform .12s,box-shadow .12s}
@@ -63,18 +63,6 @@ h1 span{color:var(--signal)}
 .btn.hot:hover{box-shadow:3px 3px 0 var(--ink)}
 
 /* HUD */
-.hud{position:relative;background:var(--sheet);border:1px solid var(--rule);border-radius:4px;overflow:hidden}
-.hud canvas{display:block;width:100%;aspect-ratio:16/10;cursor:crosshair;max-width:100%}
-.hud-bar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--rule)}
-.hud-bar div{padding:9px 12px;border-right:1px solid var(--rule);min-width:0}
-.hud-bar div:last-child{border-right:0}
-@media(max-width:520px){.hud-bar{grid-template-columns:repeat(2,minmax(0,1fr))}.hud-bar div:nth-child(2){border-right:0}.hud-bar div:nth-child(n+3){border-top:1px solid var(--rule)}.hud-bar .lbl{letter-spacing:.06em}}
-.hud-bar b{display:block;font:500 18px var(--mono);font-variant-numeric:tabular-nums;color:var(--ink)}
-.hud-tag{position:absolute;top:10px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none}
-.hud-ctl{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--rule);flex-wrap:wrap;align-items:center}
-.hud-ctl label{font:12px var(--mono);color:var(--dim);display:flex;align-items:center;gap:8px}
-.hud-ctl input{accent-color:var(--signal);width:110px}
-
 /* sheets */
 .sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:4px;margin-block:28px;position:relative}
 .tb{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;border-bottom:1px solid var(--rule)}
@@ -90,7 +78,7 @@ h1 span{color:var(--signal)}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
 @media(max-width:860px){.cols{grid-template-columns:1fr}}
 .q{font:600 clamp(19px,2vw,22px)/1.35 var(--display);margin:0;text-wrap:balance;max-width:34em}
-p.t{margin:0;color:var(--dim);max-width:62ch}
+p.t{margin:0;color:var(--dim)}
 p.t b{color:var(--ink);font-weight:600}
 ul.spec{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 ul.spec li{display:grid;grid-template-columns:20px minmax(0,1fr);gap:8px;color:var(--dim)}
@@ -159,6 +147,39 @@ td .sz{display:inline-block;height:6px;background:var(--trace);vertical-align:mi
 
 footer{padding-block:36px 48px;color:var(--dim);font:12px/1.6 var(--mono)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+
+.map{margin:32px 0}.map h2{font:600 13px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:0 0 14px}
+.focus{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.focus{grid-template-columns:1fr}}
+.lane{background:var(--sheet);border:1px solid var(--rule);border-top:3px solid var(--signal);border-radius:6px;padding:18px}
+.lane h3{margin:0 0 4px;font:600 20px/1.2 var(--display)}.lane p{margin:0 0 12px;color:var(--dim);font-size:14px}
+.lane ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+.lane li a,.lane li b{font-weight:600;text-decoration:none}.lane p{text-align:left}.lane li span{color:var(--dim)}
+.lane .soon{font:500 12px var(--mono);color:var(--dim)}
+.side{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:760px){.side{grid-template-columns:1fr}}
+.sc{display:block;background:var(--sheet);border:1px solid var(--rule);border-radius:6px;overflow:hidden;color:inherit;text-decoration:none;transition:transform .2s,border-color .2s}
+.sc:hover{transform:translateY(-2px);border-color:var(--trace)}
+.sc img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--grid)}
+.sc div{padding:12px 14px}.sc b{font:600 17px var(--display)}.sc .lbl{display:block;margin-bottom:4px}.sc p{margin:4px 0 0;font-size:14px;color:var(--dim)}
+.tinker{margin:14px 0 0;font-size:14px;color:var(--dim)}
+
+.side{grid-template-columns:repeat(2,1fr)}
+.lane.q{border-top-color:var(--trace)}
+.path{list-style:none;margin:0 0 12px;padding:0 0 0 16px;border-left:2px dashed var(--rule);display:grid;gap:9px;font-size:14px}
+.path li{position:relative;display:grid}.path li::before{content:"";position:absolute;left:-22px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--sheet);border:2px solid var(--rule)}
+.path li.done::before{background:var(--ok);border-color:var(--ok)}
+.path li.now::before{background:var(--trace);border-color:var(--trace);box-shadow:0 0 0 4px color-mix(in srgb,var(--trace) 25%,transparent)}
+.path b{font-weight:600}.path span{color:var(--dim);font-size:13px}
+.path li.now b::after{content:" · now";font:500 11px var(--mono);color:var(--trace)}
+.qlink{font:500 13px var(--mono);text-decoration:none}
+
+.lane{padding:0;overflow:hidden}.lane>*:not(.lane-img){margin-left:18px;margin-right:18px}.lane h3{margin-top:14px}.lane ul,.lane .qlink{display:block;margin-bottom:18px}
+.lane-img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;background:var(--paper);border-bottom:1px solid var(--rule)}
+
+p,li,.lead,.why,.t{text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+h1,h2,h3,.lbl,.ttl,.btn,.qcols h3,.lane li,p.q,.qsheet li{text-align:left}
 </style>
 </head>
 <body>
@@ -166,7 +187,7 @@ footer{padding-block:36px 48px;color:var(--dim);font:12px/1.6 var(--mono)}
 
 <header class="hero" id="top"><div class="wrap hero-grid">
   <div>
-    <h1>Robotics · AI ·<br><span>Computer vision</span></h1>
+    <h1>Robotics · Computer vision<br><span>&amp; quantum sensing</span></h1>
     <p class="lead">I take a systematic, technical approach to problems: model the system, build the simulation, run controlled experiments, and let the numbers decide. Below are selected projects, with code, data and results.</p>
     <div class="cta">
       <a class="btn hot" href="#fpv">View research ↓</a>
@@ -174,24 +195,37 @@ footer{padding-block:36px 48px;color:var(--dim);font:12px/1.6 var(--mono)}
       <a class="btn" href="https://github.com/cweekiat">GitHub ↗</a>
     </div>
   </div>
-  <div class="hud" aria-label="Interactive pursuit-guidance simulation">
-    <div class="hud-tag"><span class="lbl">Pursuit guidance · top-down</span><span class="lbl" id="hudState">tracking</span></div>
-    <canvas id="hud"></canvas>
-    <div class="hud-bar">
-      <div><span class="lbl">Range</span><b id="rRange">—</b></div>
-      <div><span class="lbl">Speed</span><b id="rSpeed">—</b></div>
-      <div><span class="lbl">Heading err</span><b id="rErr">—</b></div>
-      <div><span class="lbl">Intercepts</span><b id="rHits">0</b></div>
-    </div>
-    <div class="hud-ctl">
-      <label for="lat">Latency <input id="lat" type="range" min="0" max="40" value="8"><span id="latV" class="mono">80 ms</span></label>
-      <label for="gain">Nav gain <input id="gain" type="range" min="1" max="6" step=".5" value="3"><span id="gainV" class="mono">3.0</span></label>
-      <span class="lbl" style="margin-left:auto">click to move target</span>
-    </div>
-  </div>
 </div></header>
 
 <main class="wrap">
+<section class="map" id="focus" aria-label="What I work on">
+<h2>What I work on</h2>
+<div class="focus">
+ <div class="lane"><img class="lane-img" src="assets/fpv/fpv_cam.gif" alt="Camera-only view as the learned policy flies to a target" loading="lazy"><h3>Robotics</h3><p>Drones that fly themselves from a camera.</p><ul>
+  <li><a href="#fpv">From Pixels to Sticks</a> <span>· RL flight control</span></li>
+  <li><a href="#cuas">CUAS</a> <span>· drone-on-drone tracking</span></li></ul></div>
+ <div class="lane"><img class="lane-img" src="assets/cuas_demo.gif" alt="CUAS: a chaser drone detecting and tracking another drone" loading="lazy"><h3>Computer vision</h3><p>Seeing small, fast things in hard scenes.</p><ul>
+  <li><a href="#dense">DENSE-CUAS</a> <span>· event cameras + spiking nets</span></li>
+  <li><a href="#cuas">CUAS dataset</a> <span>· open detection data</span></li></ul></div>
+ <div class="lane q"><img class="lane-img" src="assets/covers/quantum.jpg" alt="A 3D concept map of quantum technology I built while studying" loading="lazy"><h3>Quantum sensing</h3><p>Bringing quantum sensors out of the lab and onto robots.</p><ul>
+  <li><b>Sensor fusion</b> <span>· quantum + classical navigation</span></li>
+  <li><b>Low-SWaP deployment</b> <span>· drones, small platforms</span></li>
+  <li><b>Quantum AI/ML</b> <span>· learning-based detection</span></li></ul></div>
+</div>
+</section>
+<section class="map" id="side" aria-label="On the side">
+<h2>On the side</h2>
+<div class="side">
+ <a class="sc" href="https://cweekiat.github.io/Heimdall/"><img src="assets/covers/heimdall.jpg" alt="" loading="lazy"><div><span class="lbl">RF sensing</span><b>Heimdall</b><p>Spots GNSS jamming and spoofing from open data.</p></div></a>
+ <a class="sc" href="https://cweekiat.github.io/geoask/"><img src="https://cweekiat.github.io/geoask/media/activity.jpg" alt="" loading="lazy"><div><span class="lbl">Geospatial</span><b>GeoAsk</b><p>Ask satellite imagery questions in plain words.</p></div></a>
+ <a class="sc" href="https://cweekiat.github.io/teman/"><img src="assets/covers/teman.jpg" alt="" loading="lazy"><div><span class="lbl">Healthcare</span><b>Teman</b><p>A gentle companion for cancer care in Singapore.</p></div></a>
+ <a class="sc" href="https://cweekiat.github.io/concord-ahp/"><img src="https://cweekiat.github.io/concord-ahp/demo/poster.png" alt="" loading="lazy"><div><span class="lbl">Decision science</span><b>Concord</b><p>Team decisions with AHP. AI checks, people decide.</p></div></a>
+</div>
+<p class="tinker">Also tinkering: <a href="https://cweekiat.github.io/mini-brain/">Mini Brain</a>, a tiny artificial brain built one function at a time.</p>
+</section>
+
+
+
 
 <!-- ================= 01 FPV ================= -->
 <article class="sheet" id="fpv">
@@ -386,69 +420,6 @@ const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
 (()=>{const r=document.documentElement,byClock=()=>{const h=new Date().getHours();return h>=7&&h<19?'light':'dark'};
   r.dataset.theme=byClock();setInterval(()=>{if(r.dataset.theme!==byClock()){r.dataset.theme=byClock();redraw()}},60000)})();
 
-/* ---------- HUD: proportional-navigation pursuit with latency ---------- */
-const cv=document.getElementById('hud'),g=cv.getContext('2d');
-let W=0,H=0,tgt,uav,hist=[],hits=0,lat=8,gain=3,flash=0;
-function fit(){const d=devicePixelRatio||1,r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;g.setTransform(d,0,0,d,0,0)}
-function reset(){uav={x:W*.12,y:H*.8,h:-0.6,v:2.2,trail:[]};hist=[];
-  tgt=tgt||{x:W*.75,y:H*.35,vx:.6,vy:.25}}
-fit();reset();new ResizeObserver(fit).observe(cv);
-cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect();tgt.x=e.clientX-r.left;tgt.y=e.clientY-r.top});
-const latI=document.getElementById('lat'),gainI=document.getElementById('gain');
-latI.oninput=()=>{lat=+latI.value;document.getElementById('latV').textContent=lat*10+' ms'};
-gainI.oninput=()=>{gain=+gainI.value;document.getElementById('gainV').textContent=gain.toFixed(1)};
-const els={range:rRange,speed:rSpeed,err:rErr,hits:rHits,state:hudState};
-let lastLos=null,frame=0;
-function tick(){
-  frame++;
-  // target wanders and bounces
-  tgt.x+=tgt.vx;tgt.y+=tgt.vy;
-  if(tgt.x<30||tgt.x>W-30)tgt.vx*=-1; if(tgt.y<40||tgt.y>H-30)tgt.vy*=-1;
-  // delayed observation of line of sight
-  hist.push({x:tgt.x,y:tgt.y}); if(hist.length>lat+1)hist.shift();
-  const seen=hist[0];
-  const los=Math.atan2(seen.y-uav.y,seen.x-uav.x);
-  let dLos=lastLos==null?0:Math.atan2(Math.sin(los-lastLos),Math.cos(los-lastLos)); lastLos=los;
-  let err=Math.atan2(Math.sin(los-uav.h),Math.cos(los-uav.h));
-  let turn=gain*dLos+0.04*err; turn=Math.max(-.07,Math.min(.07,turn));
-  uav.h+=turn; uav.x+=Math.cos(uav.h)*uav.v; uav.y+=Math.sin(uav.h)*uav.v;
-  uav.trail.push([uav.x,uav.y]); if(uav.trail.length>220)uav.trail.shift();
-  const range=Math.hypot(tgt.x-uav.x,tgt.y-uav.y);
-  if(range<10){hits++;flash=30;uav.x=Math.random()<.5?20:W-20;uav.y=H-20;uav.h=-Math.PI/2;uav.trail=[];lastLos=null}
-  if(uav.x<-40||uav.x>W+40||uav.y<-40||uav.y>H+40){uav.x=W/2;uav.y=H-10;uav.h=-Math.PI/2;uav.trail=[];lastLos=null}
-  draw(range,err);
-  if(frame%6===0){els.range.textContent=(range/4).toFixed(1)+' m';els.speed.textContent=(uav.v*12).toFixed(1)+' m/s';
-    els.err.textContent=(err*57.3).toFixed(0)+'°';els.hits.textContent=hits;els.state.textContent=flash?'intercept':(Math.abs(err)>1?'reacquiring':'tracking')}
-  if(flash)flash--;
-  if(!still)requestAnimationFrame(tick);
-}
-function draw(range,err){
-  const ink=tok('--ink'),grid=tok('--grid'),rule=tok('--rule'),sig=tok('--signal'),tr=tok('--trace'),sheet=tok('--sheet');
-  g.fillStyle=sheet;g.fillRect(0,0,W,H);
-  g.strokeStyle=grid;g.lineWidth=1;
-  for(let x=0;x<W;x+=20){g.beginPath();g.moveTo(x+.5,0);g.lineTo(x+.5,H);g.stroke()}
-  for(let y=0;y<H;y+=20){g.beginPath();g.moveTo(0,y+.5);g.lineTo(W,y+.5);g.stroke()}
-  g.strokeStyle=rule;for(let x=0;x<W;x+=100){g.beginPath();g.moveTo(x+.5,0);g.lineTo(x+.5,H);g.stroke()}
-  for(let y=0;y<H;y+=100){g.beginPath();g.moveTo(0,y+.5);g.lineTo(W,y+.5);g.stroke()}
-  // scale bar
-  g.fillStyle=ink;g.font='11px IBM Plex Mono, monospace';g.fillRect(W-112,H-18,100,2);g.fillText('25 m',W-80,H-24);
-  // delayed ghost
-  const s=hist[0];g.strokeStyle=sig;g.globalAlpha=.45;g.setLineDash([3,3]);g.beginPath();g.arc(s.x,s.y,9,0,7);g.stroke();g.setLineDash([]);g.globalAlpha=1;
-  // LOS
-  g.strokeStyle=sig;g.globalAlpha=.35;g.beginPath();g.moveTo(uav.x,uav.y);g.lineTo(s.x,s.y);g.stroke();g.globalAlpha=1;
-  // target
-  g.strokeStyle=sig;g.lineWidth=2;g.beginPath();g.arc(tgt.x,tgt.y,7+(flash?flash/3:0),0,7);g.stroke();
-  g.beginPath();g.moveTo(tgt.x-12,tgt.y);g.lineTo(tgt.x-4,tgt.y);g.moveTo(tgt.x+4,tgt.y);g.lineTo(tgt.x+12,tgt.y);
-  g.moveTo(tgt.x,tgt.y-12);g.lineTo(tgt.x,tgt.y-4);g.moveTo(tgt.x,tgt.y+4);g.lineTo(tgt.x,tgt.y+12);g.stroke();
-  // trail
-  g.strokeStyle=tr;g.lineWidth=1.6;g.beginPath();uav.trail.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();
-  // quad icon
-  g.save();g.translate(uav.x,uav.y);g.rotate(uav.h);g.strokeStyle=ink;g.lineWidth=1.5;
-  g.beginPath();g.moveTo(-7,-7);g.lineTo(7,7);g.moveTo(-7,7);g.lineTo(7,-7);g.stroke();
-  for(const [a,b] of [[-7,-7],[7,7],[-7,7],[7,-7]]){g.beginPath();g.arc(a,b,4,0,7);g.stroke()}
-  g.fillStyle=tr;g.beginPath();g.moveTo(14,0);g.lineTo(9,-3);g.lineTo(9,3);g.fill();g.restore();
-}
-tick();
 
 /* ---------- charts ---------- */
 function bars(svg,rows,o={}){
